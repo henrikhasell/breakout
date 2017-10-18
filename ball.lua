@@ -3,7 +3,7 @@ Ball = {}
   Ball.metaTable = {}
     Ball.metaTable.__index = Ball
 
-    Ball.speed = 200;
+    Ball.speed = 400;
     Ball.radius = 19;
 
   function Ball:new(x, y)
@@ -12,10 +12,10 @@ Ball = {}
       setmetatable(instance, self.metaTable)
 
       instance.body = love.physics.newBody(world, x, y, "dynamic")
-      instance.shape = love.physics.newCircleShape(19)
+      instance.shape = love.physics.newCircleShape(instance.radius)
       instance.fixture = love.physics.newFixture(instance.body, instance.shape, 1)
+      instance.fixture:setUserData(instance)
       instance.fixture:setRestitution(1)
-      instance.body:setLinearVelocity(0, 300)
       instance.dropped = true;
 
     return instance;
@@ -32,7 +32,7 @@ Ball = {}
   function Ball:update()
       if self.dropped then
         local x = paddle.body:getX()
-        local y = paddle.body:getY() - (paddle.h / 2) - self.radius
+        local y = paddle.body:getY() - (paddle.h / 2)
 
         self.body:setX(x)
         self.body:setY(y)
@@ -41,17 +41,25 @@ Ball = {}
           self.body:setLinearVelocity(0, -self.speed)
           self.dropped = false
         end
+      else
+        local y = self.body:getY()
+
+        if y > 600 + self.radius then
+          self.dropped = true
+        end
       end
   end
 
-  function Ball:beginContact(a, b, collision)
-    local ball
+  function Ball:maintainVelocity()
+    local velocityX, velocityY = self.body:getLinearVelocity()
+    local magnitude = math.sqrt(velocityX * velocityX + velocityY * velocityY)
+    local velocityX = (velocityX / magnitude) * self.speed
+    local velocityY = (velocityY / magnitude) * self.speed
+    self.body:setLinearVelocity(velocityX, velocityY)
+  end
 
-    -- This needs fixing.
-
-    if a.metaTable.__index == Ball then
-      ball = a
-    else
-      ball = b
+  function Ball:collisionCallback(object)
+    if not self.dropped then
+      self:maintainVelocity()
     end
   end
