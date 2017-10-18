@@ -56,10 +56,7 @@ Paddle = {}
       local xVelocity = (objectX - paddleX) / self.w
       local yVelocity = -2
 
-      local magnitude = math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity)
-      xVelocity = (xVelocity / magnitude) * object.speed
-      yVelocity = (yVelocity / magnitude) * object.speed
-
       object.body:setLinearVelocity(xVelocity, yVelocity)
+      object:maintainVelocity()
     end
   end

@@ -16,7 +16,6 @@ function love.load()
   backgroundImage = love.graphics.newImage("Assets/Background.png")
   paddleImage = love.graphics.newImage("Assets/Paddle.png")
   ballImage = love.graphics.newImage("Assets/Ball.png")
-  brickImage = love.graphics.newImage("Assets/Brick.png")
 
   world = love.physics.newWorld(0, 0, true)
   world:setCallbacks(nil, nil, nil, collisionCallback)
@@ -26,10 +25,21 @@ function love.load()
   paddle = Paddle:new(400, 550);
 
   for i=0,10 do
-    for j=0,5 do
-      if j % 2 == 0 then
-        Brick:new(Brick.w * i, Brick.h * j)
+    for j=0,3 do
+      local colour
+      if j == 0 then
+        colour = Brick.red
       end
+      if j == 1 then
+        colour = Brick.green
+      end
+      if j == 2 then
+        colour = Brick.blue
+      end
+      if j == 3 then
+        colour = Brick.white
+      end
+      Brick:new(Brick.w * i, Brick.h * j, colour)
     end
   end
 end
@@ -42,9 +52,8 @@ end
 
 function love.draw()
   love.graphics.draw(backgroundImage)
-  bounds:draw()
-  ball:draw()
   paddle:draw()
+  ball:draw()
 
   for k,v in pairs(Brick.bricks) do
     v:draw()

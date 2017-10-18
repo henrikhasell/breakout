@@ -3,11 +3,16 @@ Brick = {}
     Brick.metaTable.__index = Brick
 
   Brick.w = 80
-  Brick.h = 30
+  Brick.h = 50
+
+  Brick.red = love.graphics.newImage("Assets/Bricks/Red.png")
+  Brick.blue = love.graphics.newImage("Assets/Bricks/Blue.png")
+  Brick.green = love.graphics.newImage("Assets/Bricks/Green.png")
+  Brick.white = love.graphics.newImage("Assets/Bricks/Brick.png")
 
   Brick.bricks = {}
 
-  function Brick:new(x, y)
+  function Brick:new(x, y, colour)
 
     local instance = {}
       setmetatable(instance, self.metaTable)
@@ -16,6 +21,7 @@ Brick = {}
       instance.shape = love.physics.newRectangleShape(self.w / 2, self.h / 2, self.w, self.h)
       instance.fixture = love.physics.newFixture(instance.body, instance.shape, 1)
       instance.fixture:setUserData(instance)
+      instance.colour = colour
 
     table.insert(Brick.bricks, instance)
     instance.index = table.getn(Brick.bricks)
@@ -25,7 +31,7 @@ Brick = {}
 
   function Brick:draw()
     local x, y = self.body:getPosition()
-    love.graphics.draw(brickImage, x, y)
+    love.graphics.draw(self.colour, x, y)
   end
 
   function Brick:collisionCallback()
