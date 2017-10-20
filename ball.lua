@@ -3,9 +3,9 @@ Ball = {}
   Ball.metaTable = {}
     Ball.metaTable.__index = Ball
 
+    Ball.balls = {}
     Ball.speed = 400
-    Ball.radius = 19
-    Ball.dropped = true
+    Ball.radius = 15
 
   function Ball:new(x, y)
 
@@ -16,7 +16,12 @@ Ball = {}
       instance.shape = love.physics.newCircleShape(instance.radius)
       instance.fixture = love.physics.newFixture(instance.body, instance.shape, 1)
       instance.fixture:setUserData(instance)
+      instance.fixture:setFriction(0)
       instance.fixture:setRestitution(1)
+      instance.body:setLinearVelocity(0, -instance.speed)
+      instance.body:setFixedRotation(true)
+
+      table.insert(Ball.balls, instance)
 
     return instance;
   end
@@ -25,28 +30,13 @@ Ball = {}
     local r =  self.shape:getRadius()
     local x =  self.body:getX() - r
     local y =  self.body:getY() - r
-    love.graphics.draw(ballImage, x, y, r)
+    love.graphics.draw(ballImage, x, y)
   end
 
   function Ball:update()
-      if self.dropped then
-        local x = paddle.body:getX()
-        local y = paddle.body:getY() - (paddle.h / 2)
-
-        self.body:setX(x)
-        self.body:setY(y)
-
-        if love.mouse.isDown(1) then
-          self.body:setLinearVelocity(0, -self.speed)
-          self.dropped = false
-        end
-      else
-        local y = self.body:getY()
-
-        if y > 600 + self.radius then
-          self.dropped = true
-        end
-      end
+    if self.body:getY() > 600 + self.radius then
+      self:destroy()
+    end
   end
 
   function Ball:easeDirection()
@@ -73,4 +63,17 @@ Ball = {}
     if not self.dropped and getmetatable(object) ~= Paddle.metaTable then
       self:easeDirection()
     end
+  end
+
+  function Ball:destroy()
+    for key, value in pairs(Ball.balls) do
+      if value == self then
+        table.remove(Ball.balls, key)
+        break
+      end
+    end
+    if #Ball.balls == 0 then
+      paddle.hasBall = true
+    end
+    self.body:destroy()
   end

@@ -34,6 +34,6 @@ function Bounds:draw()
   love.graphics.polygon("line", self.body:getWorldPoints(self.top.shape:getPoints()))
 end
 
-function Bounds:collisionCallback()
+function Bounds:collisionCallback(object)
 
 end

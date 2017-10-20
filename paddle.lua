@@ -8,6 +8,8 @@ Paddle = {}
   Paddle.xMax = 800 - Paddle.w / 2
   Paddle.xMin = Paddle.w / 2
 
+  Paddle.hasBall = true
+
   function Paddle:new(x, y)
 
     local instance = {}
@@ -23,7 +25,14 @@ Paddle = {}
 
   function Paddle:draw()
     local x, y = self.body:getPosition()
-    love.graphics.draw(paddleImage, x - self.w / 2, y - self.h / 2)
+    local w2 = self.w / 2
+    local h2 = self.h / 2
+    if self.hasBall then
+        local ballX = x - Ball.radius
+        local ballY = y - Ball.radius * 2 - h2
+        love.graphics.draw(ballImage, ballX, ballY)
+    end
+    love.graphics.draw(paddleImage, x - w2, y - h2)
   end
 
   function Paddle:updatePosition()
@@ -38,25 +47,39 @@ Paddle = {}
     self.body:setX(x)
   end
 
+  function Paddle:createBall()
+      local x, y = self.body:getPosition()
+      local ballX = x - Ball.radius
+      local ballY = y - Ball.radius * 2 - self.h / 2
+      local ball = Ball:new(x, y)
+  end
+
   function Paddle:handleMouseInput()
-    if ball.dropped and love.mouse.isDown(1) then
-      ball.body:setLinearVelocity(0, ball.speed)
-      ball.dropped = false
+    if self.hasBall and love.mouse.isDown(1) then
+      self.hasBall = false
+      self:createBall()
     end
   end
 
   function Paddle:update()
     self:updatePosition()
+    self:handleMouseInput()
   end
 
   function Paddle:collisionCallback(object)
+    -- Have we collided with a ball?
     if getmetatable(object) == Ball.metaTable then
-      local objectX = object.body:getPosition()
-      local paddleX = self.body:getPosition()
-      local xVelocity = (objectX - paddleX) / self.w
-      local yVelocity = -2
-
-      object.body:setLinearVelocity(xVelocity, yVelocity)
-      object:maintainVelocity()
+      -- Fetch the position of the ball and the paddle.
+      local objectX, objectY = object.body:getPosition()
+      local paddleX, paddleY = self.body:getPosition()
+      -- Make sure the ball is not touching the bottom of the paddle.
+      if objectY < paddleY - self.h / 2 then
+        -- Calculate the directional vector to apply to the ball.
+        local xVelocity = (objectX - paddleX) / self.w
+        local yVelocity = -2
+        -- Set the ball's velocity.
+        object.body:setLinearVelocity(xVelocity, yVelocity)
+        object:maintainVelocity()
+      end
     end
   end
