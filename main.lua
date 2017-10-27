@@ -11,16 +11,19 @@ function collisionCallback(fixture1, fixture2, collision)
 end
 
 function love.load()
+  font = love.graphics.newFont("Assets/NanumGothic-Regular.ttf", 18)
   backgroundImage = love.graphics.newImage("Assets/Background.png")
   paddleImage = love.graphics.newImage("Assets/Paddle.png")
   brickImage = love.graphics.newImage("Assets/Brick.png")
   ballImage = love.graphics.newImage("Assets/Ball.png")
+  love.graphics.setFont(font)
 
   world = love.physics.newWorld(0, 0, true)
   world:setCallbacks(nil, nil, nil, collisionCallback)
 
   bounds = Bounds:new(0, 0)
   paddle = Paddle:new(400, 550);
+  lives = 4
 
   for i=0,9 do
     for j=0,5 do
@@ -51,10 +54,11 @@ function love.draw()
   for k,v in pairs(Brick.bricks) do
     v:draw()
   end
-
   love.graphics.setColor(0xff,  0xff,  0xff, 0xff)
 
   for k,v in pairs(Ball.balls) do
     v:draw()
   end
+
+  love.graphics.print("Lives: " .. lives)
 end

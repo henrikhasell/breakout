@@ -1,4 +1,4 @@
 love:
-	zip breakout.love ./Assets/*.png ./*.lua
+	zip breakout.love ./Assets/*.{png,ttf} ./*.lua
 clean:
 	rm -f breakout.love

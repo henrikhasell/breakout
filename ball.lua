@@ -73,7 +73,10 @@ Ball = {}
       end
     end
     if #Ball.balls == 0 then
-      paddle.hasBall = true
+      lives = lives - 1
+      if lives > 0 then
+        paddle.hasBall = true
+      end
     end
     self.body:destroy()
   end
